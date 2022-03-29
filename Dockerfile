@@ -6,10 +6,13 @@ ARG MATLAB_RELEASE=r2021b
 
 # When you start the build stage, this Dockerfile by default uses the Ubuntu-based matlab-deps image.
 # To check the available matlab-deps images, see: https://hub.docker.com/r/mathworks/matlab-deps
-FROM mathworks/matlab-deps:${MATLAB_RELEASE}
+FROM mathworks/matlab-deps:${MATLAB_RELEASE} as matlab
 
 # Declare the global argument to use at the current build stage
 ARG MATLAB_RELEASE
+
+# Matlab products to install
+ARG MATLAB_PRODUCTS="MATLAB MATLAB_Parallel_Server Parallel_Computing_Toolbox"
 
 # Install mpm dependencies
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && \
@@ -25,7 +28,7 @@ RUN wget -q https://www.mathworks.com/mpm/glnxa64/mpm && \
     ./mpm install \
         --release=${MATLAB_RELEASE} \
         --destination=/opt/matlab \
-        --products MATLAB && \
+        --products ${MATLAB_PRODUCTS} && \
     rm -f mpm /tmp/mathworks_root.log && \
     ln -s /opt/matlab/bin/matlab /usr/local/bin/matlab
 
